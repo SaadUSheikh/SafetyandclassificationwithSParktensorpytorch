@@ -1,0 +1,400 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/SaadUSheikh/SafetyandclassificationwithSParktensorpytorch/blob/main/FashionmodelswithTFipynb\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 1,
+      "id": "clean-rolling",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "clean-rolling",
+        "outputId": "7038e477-bf3a-4a4a-de5c-8883e4e604a9"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Requirement already satisfied: tensorflow in /usr/local/lib/python3.11/dist-packages (2.18.0)\n",
+            "Collecting tensorflow\n",
+            "  Downloading tensorflow-2.19.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.1 kB)\n",
+            "Requirement already satisfied: absl-py>=1.0.0 in /usr/local/lib/python3.11/dist-packages (from tensorflow) (1.4.0)\n",
+            "Requirement already satisfied: astunparse>=1.6.0 in /usr/local/lib/python3.11/dist-packages (from tensorflow) (1.6.3)\n",
+            "Requirement already satisfied: flatbuffers>=24.3.25 in /usr/local/lib/python3.11/dist-packages (from tensorflow) (25.2.10)\n",
+            "Requirement already satisfied: gast!=0.5.0,!=0.5.1,!=0.5.2,>=0.2.1 in /usr/local/lib/python3.11/dist-packages (from tensorflow) (0.6.0)\n",
+            "Requirement already satisfied: google-pasta>=0.1.1 in /usr/local/lib/python3.11/dist-packages (from tensorflow) (0.2.0)\n",
+            "Requirement already satisfied: libclang>=13.0.0 in /usr/local/lib/python3.11/dist-packages (from tensorflow) (18.1.1)\n",
+            "Requirement already satisfied: opt-einsum>=2.3.2 in /usr/local/lib/python3.11/dist-packages (from tensorflow) (3.4.0)\n",
+            "Requirement already satisfied: packaging in /usr/local/lib/python3.11/dist-packages (from tensorflow) (24.2)\n",
+            "Requirement already satisfied: protobuf!=4.21.0,!=4.21.1,!=4.21.2,!=4.21.3,!=4.21.4,!=4.21.5,<6.0.0dev,>=3.20.3 in /usr/local/lib/python3.11/dist-packages (from tensorflow) (4.25.6)\n",
+            "Requirement already satisfied: requests<3,>=2.21.0 in /usr/local/lib/python3.11/dist-packages (from tensorflow) (2.32.3)\n",
+            "Requirement already satisfied: setuptools in /usr/local/lib/python3.11/dist-packages (from tensorflow) (75.1.0)\n",
+            "Requirement already satisfied: six>=1.12.0 in /usr/local/lib/python3.11/dist-packages (from tensorflow) (1.17.0)\n",
+            "Requirement already satisfied: termcolor>=1.1.0 in /usr/local/lib/python3.11/dist-packages (from tensorflow) (2.5.0)\n",
+            "Requirement already satisfied: typing-extensions>=3.6.6 in /usr/local/lib/python3.11/dist-packages (from tensorflow) (4.12.2)\n",
+            "Requirement already satisfied: wrapt>=1.11.0 in /usr/local/lib/python3.11/dist-packages (from tensorflow) (1.17.2)\n",
+            "Requirement already satisfied: grpcio<2.0,>=1.24.3 in /usr/local/lib/python3.11/dist-packages (from tensorflow) (1.71.0)\n",
+            "Collecting tensorboard~=2.19.0 (from tensorflow)\n",
+            "  Downloading tensorboard-2.19.0-py3-none-any.whl.metadata (1.8 kB)\n",
+            "Requirement already satisfied: keras>=3.5.0 in /usr/local/lib/python3.11/dist-packages (from tensorflow) (3.8.0)\n",
+            "Requirement already satisfied: numpy<2.2.0,>=1.26.0 in /usr/local/lib/python3.11/dist-packages (from tensorflow) (1.26.4)\n",
+            "Requirement already satisfied: h5py>=3.11.0 in /usr/local/lib/python3.11/dist-packages (from tensorflow) (3.12.1)\n",
+            "Collecting ml-dtypes<1.0.0,>=0.5.1 (from tensorflow)\n",
+            "  Downloading ml_dtypes-0.5.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (21 kB)\n",
+            "Requirement already satisfied: tensorflow-io-gcs-filesystem>=0.23.1 in /usr/local/lib/python3.11/dist-packages (from tensorflow) (0.37.1)\n",
+            "Requirement already satisfied: wheel<1.0,>=0.23.0 in /usr/local/lib/python3.11/dist-packages (from astunparse>=1.6.0->tensorflow) (0.45.1)\n",
+            "Requirement already satisfied: rich in /usr/local/lib/python3.11/dist-packages (from keras>=3.5.0->tensorflow) (13.9.4)\n",
+            "Requirement already satisfied: namex in /usr/local/lib/python3.11/dist-packages (from keras>=3.5.0->tensorflow) (0.0.8)\n",
+            "Requirement already satisfied: optree in /usr/local/lib/python3.11/dist-packages (from keras>=3.5.0->tensorflow) (0.14.1)\n",
+            "Requirement already satisfied: charset-normalizer<4,>=2 in /usr/local/lib/python3.11/dist-packages (from requests<3,>=2.21.0->tensorflow) (3.4.1)\n",
+            "Requirement already satisfied: idna<4,>=2.5 in /usr/local/lib/python3.11/dist-packages (from requests<3,>=2.21.0->tensorflow) (3.10)\n",
+            "Requirement already satisfied: urllib3<3,>=1.21.1 in /usr/local/lib/python3.11/dist-packages (from requests<3,>=2.21.0->tensorflow) (2.3.0)\n",
+            "Requirement already satisfied: certifi>=2017.4.17 in /usr/local/lib/python3.11/dist-packages (from requests<3,>=2.21.0->tensorflow) (2025.1.31)\n",
+            "Requirement already satisfied: markdown>=2.6.8 in /usr/local/lib/python3.11/dist-packages (from tensorboard~=2.19.0->tensorflow) (3.7)\n",
+            "Requirement already satisfied: tensorboard-data-server<0.8.0,>=0.7.0 in /usr/local/lib/python3.11/dist-packages (from tensorboard~=2.19.0->tensorflow) (0.7.2)\n",
+            "Requirement already satisfied: werkzeug>=1.0.1 in /usr/local/lib/python3.11/dist-packages (from tensorboard~=2.19.0->tensorflow) (3.1.3)\n",
+            "Requirement already satisfied: MarkupSafe>=2.1.1 in /usr/local/lib/python3.11/dist-packages (from werkzeug>=1.0.1->tensorboard~=2.19.0->tensorflow) (3.0.2)\n",
+            "Requirement already satisfied: markdown-it-py>=2.2.0 in /usr/local/lib/python3.11/dist-packages (from rich->keras>=3.5.0->tensorflow) (3.0.0)\n",
+            "Requirement already satisfied: pygments<3.0.0,>=2.13.0 in /usr/local/lib/python3.11/dist-packages (from rich->keras>=3.5.0->tensorflow) (2.18.0)\n",
+            "Requirement already satisfied: mdurl~=0.1 in /usr/local/lib/python3.11/dist-packages (from markdown-it-py>=2.2.0->rich->keras>=3.5.0->tensorflow) (0.1.2)\n",
+            "Downloading tensorflow-2.19.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (644.9 MB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m644.9/644.9 MB\u001b[0m \u001b[31m2.6 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hDownloading ml_dtypes-0.5.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (4.7 MB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m4.7/4.7 MB\u001b[0m \u001b[31m65.4 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hDownloading tensorboard-2.19.0-py3-none-any.whl (5.5 MB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m5.5/5.5 MB\u001b[0m \u001b[31m79.6 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hInstalling collected packages: ml-dtypes, tensorboard, tensorflow\n",
+            "  Attempting uninstall: ml-dtypes\n",
+            "    Found existing installation: ml-dtypes 0.4.1\n",
+            "    Uninstalling ml-dtypes-0.4.1:\n",
+            "      Successfully uninstalled ml-dtypes-0.4.1\n",
+            "  Attempting uninstall: tensorboard\n",
+            "    Found existing installation: tensorboard 2.18.0\n",
+            "    Uninstalling tensorboard-2.18.0:\n",
+            "      Successfully uninstalled tensorboard-2.18.0\n",
+            "  Attempting uninstall: tensorflow\n",
+            "    Found existing installation: tensorflow 2.18.0\n",
+            "    Uninstalling tensorflow-2.18.0:\n",
+            "      Successfully uninstalled tensorflow-2.18.0\n",
+            "\u001b[31mERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.\n",
+            "tensorflow-text 2.18.1 requires tensorflow<2.19,>=2.18.0, but you have tensorflow 2.19.0 which is incompatible.\n",
+            "tf-keras 2.18.0 requires tensorflow<2.19,>=2.18, but you have tensorflow 2.19.0 which is incompatible.\u001b[0m\u001b[31m\n",
+            "\u001b[0mSuccessfully installed ml-dtypes-0.5.1 tensorboard-2.19.0 tensorflow-2.19.0\n"
+          ]
+        }
+      ],
+      "source": [
+        "! pip3 install --upgrade tensorflow"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 2,
+      "id": "aware-farming",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "aware-farming",
+        "outputId": "5d09281b-217d-466c-d545-9fa96d328783"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Downloading data from https://storage.googleapis.com/tensorflow/tf-keras-datasets/train-labels-idx1-ubyte.gz\n",
+            "\u001b[1m29515/29515\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m0s\u001b[0m 0us/step\n",
+            "Downloading data from https://storage.googleapis.com/tensorflow/tf-keras-datasets/train-images-idx3-ubyte.gz\n",
+            "\u001b[1m26421880/26421880\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m2s\u001b[0m 0us/step\n",
+            "Downloading data from https://storage.googleapis.com/tensorflow/tf-keras-datasets/t10k-labels-idx1-ubyte.gz\n",
+            "\u001b[1m5148/5148\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m0s\u001b[0m 0us/step\n",
+            "Downloading data from https://storage.googleapis.com/tensorflow/tf-keras-datasets/t10k-images-idx3-ubyte.gz\n",
+            "\u001b[1m4422102/4422102\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m1s\u001b[0m 0us/step\n"
+          ]
+        }
+      ],
+      "source": [
+        "import numpy as np\n",
+        "\n",
+        "import tensorflow as tf\n",
+        "\n",
+        "train, test = tf.keras.datasets.fashion_mnist.load_data()\n",
+        "\n",
+        "images, labels = train\n",
+        "\n",
+        "labels = labels.astype(np.int32)\n",
+        "\n",
+        "images = images/256\n",
+        "\n",
+        "train_ds = tf.data.Dataset.from_tensor_slices((images, labels))\n",
+        "\n",
+        "train_ds = train_ds.batch(32)"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 3,
+      "id": "sustainable-reducing",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 447
+        },
+        "id": "sustainable-reducing",
+        "outputId": "c751c3b6-06d0-4199-ed44-3b7508cd2243"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "label:9\n"
+          ]
+        },
+        {
+          "output_type": "display_data",
+          "data": {
+            "text/plain": [
+              "<Figure size 640x480 with 1 Axes>"
+            ],
+            "image/png": "iVBORw0KGgoAAAANSUhEUgAAAaAAAAGdCAYAAABU0qcqAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90bGliIHZlcnNpb24zLjEwLjAsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvlHJYcgAAAAlwSFlzAAAPYQAAD2EBqD+naQAAINpJREFUeJzt3Xts1fX9x/HXaaGHQtvDSulNylUQIxc3hFpRfioV6BIjQiZe/oDNS2TFDJnTsKjoXFLHks24MUy2BWYi3hKBaJQFi5Q5Lg6EIJkjgChgabnMnlN6p/3+/iB2Vq6fj+f03ZbnI/km9Jzvi+/HL9/25bfn9N1QEASBAADoZEnWCwAAXJ4oIACACQoIAGCCAgIAmKCAAAAmKCAAgAkKCABgggICAJjoZb2Ab2tra1NlZaXS09MVCoWslwMAcBQEgWpra5Wfn6+kpPPf53S5AqqsrFRBQYH1MgAA39Hhw4c1aNCg8z7f5b4Fl56ebr0EAEAcXOzrecIKaNmyZRo6dKj69OmjwsJCffTRR5eU49tuANAzXOzreUIK6PXXX9eiRYu0ZMkSffzxxxo/frymT5+uY8eOJeJwAIDuKEiASZMmBaWlpe0ft7a2Bvn5+UFZWdlFs9FoNJDExsbGxtbNt2g0esGv93G/A2pubtaOHTtUXFzc/lhSUpKKi4u1ZcuWs/ZvampSLBbrsAEAer64F9CJEyfU2tqqnJycDo/n5OSoqqrqrP3LysoUiUTaN94BBwCXB/N3wS1evFjRaLR9O3z4sPWSAACdIO4/B5SVlaXk5GRVV1d3eLy6ulq5ubln7R8OhxUOh+O9DABAFxf3O6CUlBRNmDBB5eXl7Y+1tbWpvLxcRUVF8T4cAKCbSsgkhEWLFmnu3Lm67rrrNGnSJL3wwguqq6vTj3/840QcDgDQDSWkgObMmaPjx4/r6aefVlVVla699lqtW7furDcmAAAuX6EgCALrRXxTLBZTJBKxXgYA4DuKRqPKyMg47/Pm74IDAFyeKCAAgAkKCABgggICAJiggAAAJiggAIAJCggAYIICAgCYoIAAACYoIACACQoIAGCCAgIAmKCAAAAmKCAAgAkKCABgggICAJiggAAAJiggAIAJCggAYIICAgCYoIAAACYoIACACQoIAGCCAgIAmKCAAAAmKCAAgIle1gsAupJQKOScCYIgASs5W3p6unPmxhtv9DrWe++955Vz5XO+k5OTnTOnT592znR1PufOV6Kuce6AAAAmKCAAgAkKCABgggICAJiggAAAJiggAIAJCggAYIICAgCYoIAAACYoIACACQoIAGCCAgIAmGAYKfANSUnu/0/W2trqnLnyyiudMw888IBzpqGhwTkjSXV1dc6ZxsZG58xHH33knOnMwaI+Az99riGf43TmeXAdABsEgdra2i66H3dAAAATFBAAwAQFBAAwQQEBAExQQAAAExQQAMAEBQQAMEEBAQBMUEAAABMUEADABAUEADBBAQEATDCMFPgG16GLkt8w0ltvvdU5U1xc7Jw5cuSIc0aSwuGwc6Zv377Omdtuu80585e//MU5U11d7ZyRzgzVdOVzPfhIS0vzyl3KkNBvq6+v9zrWxXAHBAAwQQEBAEzEvYCeeeYZhUKhDtvo0aPjfRgAQDeXkNeArrnmGr3//vv/O0gvXmoCAHSUkGbo1auXcnNzE/FXAwB6iIS8BrRv3z7l5+dr+PDhuu+++3To0KHz7tvU1KRYLNZhAwD0fHEvoMLCQq1cuVLr1q3T8uXLdfDgQd10002qra095/5lZWWKRCLtW0FBQbyXBADoguJeQCUlJfrRj36kcePGafr06Xr33XdVU1OjN95445z7L168WNFotH07fPhwvJcEAOiCEv7ugP79+2vUqFHav3//OZ8Ph8NeP/QGAOjeEv5zQKdOndKBAweUl5eX6EMBALqRuBfQY489poqKCn3++efavHmz7rzzTiUnJ+uee+6J96EAAN1Y3L8Fd+TIEd1zzz06efKkBg4cqBtvvFFbt27VwIED430oAEA3FvcCeu211+L9VwKdprm5uVOOM3HiROfM0KFDnTM+w1UlKSnJ/Zsjf//7350z3//+950zS5cudc5s377dOSNJn3zyiXPm008/dc5MmjTJOeNzDUnS5s2bnTNbtmxx2j8Igkv6kRpmwQEATFBAAAATFBAAwAQFBAAwQQEBAExQQAAAExQQAMAEBQQAMEEBAQBMUEAAABMUEADABAUEADCR8F9IB1gIhUJeuSAInDO33Xabc+a6665zzpzv19pfSL9+/ZwzkjRq1KhOyfzrX/9yzpzvl1teSFpamnNGkoqKipwzs2bNcs60tLQ4Z3zOnSQ98MADzpmmpian/U+fPq1//OMfF92POyAAgAkKCABgggICAJiggAAAJiggAIAJCggAYIICAgCYoIAAACYoIACACQoIAGCCAgIAmKCAAAAmKCAAgIlQ4DP+N4FisZgikYj1MpAgvlOqO4vPp8PWrVudM0OHDnXO+PA936dPn3bONDc3ex3LVWNjo3Omra3N61gff/yxc8ZnWrfP+Z4xY4ZzRpKGDx/unLniiiu8jhWNRpWRkXHe57kDAgCYoIAAACYoIACACQoIAGCCAgIAmKCAAAAmKCAAgAkKCABgggICAJiggAAAJiggAIAJCggAYKKX9QJweelis2/j4quvvnLO5OXlOWcaGhqcM+Fw2DkjSb16uX9pSEtLc874DBZNTU11zvgOI73pppucMzfccINzJinJ/V4gOzvbOSNJ69at88olAndAAAATFBAAwAQFBAAwQQEBAExQQAAAExQQAMAEBQQAMEEBAQBMUEAAABMUEADABAUEADBBAQEATDCMFPiO+vbt65zxGT7pk6mvr3fOSFI0GnXOnDx50jkzdOhQ54zPQNtQKOSckfzOuc/10Nra6pzxHbBaUFDglUsE7oAAACYoIACACecC2rRpk26//Xbl5+crFAppzZo1HZ4PgkBPP/208vLylJqaquLiYu3bty9e6wUA9BDOBVRXV6fx48dr2bJl53x+6dKlevHFF/XSSy9p27Zt6tevn6ZPn+71i6cAAD2X85sQSkpKVFJScs7ngiDQCy+8oCeffFJ33HGHJOnll19WTk6O1qxZo7vvvvu7rRYA0GPE9TWggwcPqqqqSsXFxe2PRSIRFRYWasuWLefMNDU1KRaLddgAAD1fXAuoqqpKkpSTk9Ph8ZycnPbnvq2srEyRSKR960pvEQQAJI75u+AWL16saDTavh0+fNh6SQCAThDXAsrNzZUkVVdXd3i8urq6/blvC4fDysjI6LABAHq+uBbQsGHDlJubq/Ly8vbHYrGYtm3bpqKiongeCgDQzTm/C+7UqVPav39/+8cHDx7Url27lJmZqcGDB2vhwoX69a9/rZEjR2rYsGF66qmnlJ+fr5kzZ8Zz3QCAbs65gLZv365bbrml/eNFixZJkubOnauVK1fq8ccfV11dnR566CHV1NToxhtv1Lp169SnT5/4rRoA0O2FAp/JfgkUi8UUiUSsl4EE8RkK6TMQ0me4oySlpaU5Z3bu3Omc8TkPDQ0NzplwOOyckaTKykrnzLdf+70UN9xwg3PGZ+ipz4BQSUpJSXHO1NbWOmd8vub5vmHL5xq///77nfZvbW3Vzp07FY1GL/i6vvm74AAAlycKCABgggICAJiggAAAJiggAIAJCggAYIICAgCYoIAAACYoIACACQoIAGCCAgIAmKCAAAAmKCAAgAnnX8cAfBc+w9eTk5OdM77TsOfMmeOcOd9v+72Q48ePO2dSU1OdM21tbc4ZSerXr59zpqCgwDnT3NzsnPGZ8N3S0uKckaRevdy/RPr8Ow0YMMA5s2zZMueMJF177bXOGZ/zcCm4AwIAmKCAAAAmKCAAgAkKCABgggICAJiggAAAJiggAIAJCggAYIICAgCYoIAAACYoIACACQoIAGCCYaToVD5DDX0GVvras2ePc6apqck507t3b+dMZw5lzc7Ods40NjY6Z06ePOmc8Tl3ffr0cc5IfkNZv/rqK+fMkSNHnDP33nuvc0aSfvvb3zpntm7d6nWsi+EOCABgggICAJiggAAAJiggAIAJCggAYIICAgCYoIAAACYoIACACQoIAGCCAgIAmKCAAAAmKCAAgInLehhpKBTyyvkMhUxKcu96n/W1tLQ4Z9ra2pwzvk6fPt1px/Lx7rvvOmfq6uqcMw0NDc6ZlJQU50wQBM4ZSTp+/LhzxufzwmdIqM817quzPp98zt24ceOcM5IUjUa9conAHRAAwAQFBAAwQQEBAExQQAAAExQQAMAEBQQAMEEBAQBMUEAAABMUEADABAUEADBBAQEATFBAAAATPWYYqc8wv9bWVq9jdfWBml3ZlClTnDOzZ892zkyePNk5I0n19fXOmZMnTzpnfAaL9url/unqe437nAefz8FwOOyc8Rlg6juU1ec8+PC5Hk6dOuV1rFmzZjln3n77ba9jXQx3QAAAExQQAMCEcwFt2rRJt99+u/Lz8xUKhbRmzZoOz8+bN0+hUKjDNmPGjHitFwDQQzgXUF1dncaPH69ly5add58ZM2bo6NGj7durr776nRYJAOh5nF/VLCkpUUlJyQX3CYfDys3N9V4UAKDnS8hrQBs3blR2drauuuoqzZ8//4LvEmpqalIsFuuwAQB6vrgX0IwZM/Tyyy+rvLxcv/nNb1RRUaGSkpLzvh20rKxMkUikfSsoKIj3kgAAXVDcfw7o7rvvbv/z2LFjNW7cOI0YMUIbN27U1KlTz9p/8eLFWrRoUfvHsViMEgKAy0DC34Y9fPhwZWVlaf/+/ed8PhwOKyMjo8MGAOj5El5AR44c0cmTJ5WXl5foQwEAuhHnb8GdOnWqw93MwYMHtWvXLmVmZiozM1PPPvusZs+erdzcXB04cECPP/64rrzySk2fPj2uCwcAdG/OBbR9+3bdcsst7R9//frN3LlztXz5cu3evVt/+9vfVFNTo/z8fE2bNk3PPfec18wnAEDPFQp8p/QlSCwWUyQSsV5G3GVmZjpn8vPznTMjR47slONIfkMNR40a5ZxpampyziQl+X13uaWlxTmTmprqnKmsrHTO9O7d2znjM+RSkgYMGOCcaW5uds707dvXObN582bnTFpamnNG8hue29bW5pyJRqPOGZ/rQZKqq6udM1dffbXXsaLR6AVf12cWHADABAUEADBBAQEATFBAAAATFBAAwAQFBAAwQQEBAExQQAAAExQQAMAEBQQAMEEBAQBMUEAAABMUEADARNx/JbeV66+/3jnz3HPPeR1r4MCBzpn+/fs7Z1pbW50zycnJzpmamhrnjCSdPn3aOVNbW+uc8ZmyHAqFnDOS1NDQ4Jzxmc581113OWe2b9/unElPT3fOSH4TyIcOHep1LFdjx451zvieh8OHDztn6uvrnTM+E9V9J3wPGTLEK5cI3AEBAExQQAAAExQQAMAEBQQAMEEBAQBMUEAAABMUEADABAUEADBBAQEATFBAAAATFBAAwAQFBAAw0WWHkSYlJTkNlHzxxRedj5GXl+eckfyGhPpkfIYa+khJSfHK+fw3+Qz79BGJRLxyPoMan3/+eeeMz3mYP3++c6aystI5I0mNjY3OmfLycufMZ5995pwZOXKkc2bAgAHOGclvEG7v3r2dM0lJ7vcCLS0tzhlJOn78uFcuEbgDAgCYoIAAACYoIACACQoIAGCCAgIAmKCAAAAmKCAAgAkKCABgggICAJiggAAAJiggAIAJCggAYCIUBEFgvYhvisViikQiuu+++5yGZPoMhDxw4IBzRpLS0tI6JRMOh50zPnyGJ0p+Az8PHz7snPEZqDlw4EDnjOQ3FDI3N9c5M3PmTOdMnz59nDNDhw51zkh+1+uECRM6JePzb+QzVNT3WL7DfV25DGv+Jp/P9+uvv95p/7a2Nn355ZeKRqPKyMg4737cAQEATFBAAAATFBAAwAQFBAAwQQEBAExQQAAAExQQAMAEBQQAMEEBAQBMUEAAABMUEADABAUEADDRy3oB53P8+HGnoXk+Qy7T09OdM5LU1NTknPFZn89ASJ9BiBcaFngh//3vf50zX3zxhXPG5zw0NDQ4ZySpsbHROXP69GnnzOrVq50zn3zyiXPGdxhpZmamc8Zn4GdNTY1zpqWlxTnj828knRmq6cpn2KfPcXyHkfp8jRg1apTT/qdPn9aXX3550f24AwIAmKCAAAAmnAqorKxMEydOVHp6urKzszVz5kzt3bu3wz6NjY0qLS3VgAEDlJaWptmzZ6u6ujquiwYAdH9OBVRRUaHS0lJt3bpV69evV0tLi6ZNm6a6urr2fR599FG9/fbbevPNN1VRUaHKykrNmjUr7gsHAHRvTm9CWLduXYePV65cqezsbO3YsUNTpkxRNBrVX//6V61atUq33nqrJGnFihW6+uqrtXXrVuffqgcA6Lm+02tA0WhU0v/eMbNjxw61tLSouLi4fZ/Ro0dr8ODB2rJlyzn/jqamJsVisQ4bAKDn8y6gtrY2LVy4UJMnT9aYMWMkSVVVVUpJSVH//v077JuTk6Oqqqpz/j1lZWWKRCLtW0FBge+SAADdiHcBlZaWas+ePXrttde+0wIWL16saDTavvn8vAwAoPvx+kHUBQsW6J133tGmTZs0aNCg9sdzc3PV3NysmpqaDndB1dXVys3NPeffFQ6HFQ6HfZYBAOjGnO6AgiDQggULtHr1am3YsEHDhg3r8PyECRPUu3dvlZeXtz+2d+9eHTp0SEVFRfFZMQCgR3C6AyotLdWqVau0du1apaent7+uE4lElJqaqkgkovvvv1+LFi1SZmamMjIy9Mgjj6ioqIh3wAEAOnAqoOXLl0uSbr755g6Pr1ixQvPmzZMk/f73v1dSUpJmz56tpqYmTZ8+XX/605/islgAQM8RCoIgsF7EN8ViMUUiEY0dO1bJycmXnPvzn//sfKwTJ044ZySpX79+zpkBAwY4Z3wGNZ46dco54zM8UZJ69XJ/CdFn6GLfvn2dMz4DTCW/c5GU5P5eHp9Pu2+/u/RSfPOHxF34DHP96quvnDM+r//6fN76DDCV/IaY+hwrNTXVOXO+19UvxmeI6SuvvOK0f1NTk/74xz8qGo1ecNgxs+AAACYoIACACQoIAGCCAgIAmKCAAAAmKCAAgAkKCABgggICAJiggAAAJiggAIAJCggAYIICAgCYoIAAACa8fiNqZ/jkk0+c9n/rrbecj/GTn/zEOSNJlZWVzpnPPvvMOdPY2Oic8ZkC7TsN22eCb0pKinPGZSr615qampwzktTa2uqc8ZlsXV9f75w5evSoc8Z32L3PefCZjt5Z13hzc7NzRvKbSO+T8Zmg7TOpW9JZv0j0UlRXVzvtf6nnmzsgAIAJCggAYIICAgCYoIAAACYoIACACQoIAGCCAgIAmKCAAAAmKCAAgAkKCABgggICAJiggAAAJkKB77TCBInFYopEIp1yrJKSEq/cY4895pzJzs52zpw4ccI54zMI0WfwpOQ3JNRnGKnPkEuftUlSKBRyzvh8CvkMgPXJ+Jxv32P5nDsfPsdxHab5Xfic87a2NudMbm6uc0aSdu/e7Zy56667vI4VjUaVkZFx3ue5AwIAmKCAAAAmKCAAgAkKCABgggICAJiggAAAJiggAIAJCggAYIICAgCYoIAAACYoIACACQoIAGCiyw4jDYVCTkMHfYb5daZbbrnFOVNWVuac8Rl66jv8NSnJ/f9ffIaE+gwj9R2w6uPYsWPOGZ9Puy+//NI54/t5cerUKeeM7wBYVz7nrqWlxetY9fX1zhmfz4v169c7Zz799FPnjCRt3rzZK+eDYaQAgC6JAgIAmKCAAAAmKCAAgAkKCABgggICAJiggAAAJiggAIAJCggAYIICAgCYoIAAACYoIACAiS47jBSdZ/To0V65rKws50xNTY1zZtCgQc6Zzz//3Dkj+Q2tPHDggNexgJ6OYaQAgC6JAgIAmHAqoLKyMk2cOFHp6enKzs7WzJkztXfv3g773Hzzze2/y+fr7eGHH47rogEA3Z9TAVVUVKi0tFRbt27V+vXr1dLSomnTpqmurq7Dfg8++KCOHj3avi1dujSuiwYAdH9Ov2py3bp1HT5euXKlsrOztWPHDk2ZMqX98b59+yo3Nzc+KwQA9Ejf6TWgaDQqScrMzOzw+CuvvKKsrCyNGTNGixcvvuCvtW1qalIsFuuwAQB6Pqc7oG9qa2vTwoULNXnyZI0ZM6b98XvvvVdDhgxRfn6+du/erSeeeEJ79+7VW2+9dc6/p6ysTM8++6zvMgAA3ZT3zwHNnz9f7733nj788MML/pzGhg0bNHXqVO3fv18jRow46/mmpiY1NTW1fxyLxVRQUOCzJHji54D+h58DAuLnYj8H5HUHtGDBAr3zzjvatGnTRb84FBYWStJ5CygcDiscDvssAwDQjTkVUBAEeuSRR7R69Wpt3LhRw4YNu2hm165dkqS8vDyvBQIAeianAiotLdWqVau0du1apaenq6qqSpIUiUSUmpqqAwcOaNWqVfrhD3+oAQMGaPfu3Xr00Uc1ZcoUjRs3LiH/AQCA7smpgJYvXy7pzA+bftOKFSs0b948paSk6P3339cLL7yguro6FRQUaPbs2XryySfjtmAAQM/g/C24CykoKFBFRcV3WhAA4PLANGwAQEIwDRsA0CVRQAAAExQQAMAEBQQAMEEBAQBMUEAAABMUEADABAUEADBBAQEATFBAAAATFBAAwAQFBAAwQQEBAExQQAAAExQQAMAEBQQAMEEBAQBMUEAAABMUEADABAUEADBBAQEATFBAAAATFBAAwAQFBAAw0eUKKAgC6yUAAOLgYl/Pu1wB1dbWWi8BABAHF/t6Hgq62C1HW1ubKisrlZ6erlAo1OG5WCymgoICHT58WBkZGUYrtMd5OIPzcAbn4QzOwxld4TwEQaDa2lrl5+crKen89zm9OnFNlyQpKUmDBg264D4ZGRmX9QX2Nc7DGZyHMzgPZ3AezrA+D5FI5KL7dLlvwQEALg8UEADARLcqoHA4rCVLligcDlsvxRTn4QzOwxmchzM4D2d0p/PQ5d6EAAC4PHSrOyAAQM9BAQEATFBAAAATFBAAwES3KaBly5Zp6NCh6tOnjwoLC/XRRx9ZL6nTPfPMMwqFQh220aNHWy8r4TZt2qTbb79d+fn5CoVCWrNmTYfngyDQ008/rby8PKWmpqq4uFj79u2zWWwCXew8zJs376zrY8aMGTaLTZCysjJNnDhR6enpys7O1syZM7V3794O+zQ2Nqq0tFQDBgxQWlqaZs+ererqaqMVJ8alnIebb775rOvh4YcfNlrxuXWLAnr99de1aNEiLVmyRB9//LHGjx+v6dOn69ixY9ZL63TXXHONjh492r59+OGH1ktKuLq6Oo0fP17Lli075/NLly7Viy++qJdeeknbtm1Tv379NH36dDU2NnbyShPrYudBkmbMmNHh+nj11Vc7cYWJV1FRodLSUm3dulXr169XS0uLpk2bprq6uvZ9Hn30Ub399tt68803VVFRocrKSs2aNctw1fF3KedBkh588MEO18PSpUuNVnweQTcwadKkoLS0tP3j1tbWID8/PygrKzNcVedbsmRJMH78eOtlmJIUrF69uv3jtra2IDc3N/jtb3/b/lhNTU0QDoeDV1991WCFnePb5yEIgmDu3LnBHXfcYbIeK8eOHQskBRUVFUEQnPm37927d/Dmm2+27/Ppp58GkoItW7ZYLTPhvn0egiAI/u///i/42c9+ZreoS9Dl74Cam5u1Y8cOFRcXtz+WlJSk4uJibdmyxXBlNvbt26f8/HwNHz5c9913nw4dOmS9JFMHDx5UVVVVh+sjEomosLDwsrw+Nm7cqOzsbF111VWaP3++Tp48ab2khIpGo5KkzMxMSdKOHTvU0tLS4XoYPXq0Bg8e3KOvh2+fh6+98sorysrK0pgxY7R48WLV19dbLO+8utww0m87ceKEWltblZOT0+HxnJwc/ec//zFalY3CwkKtXLlSV111lY4ePapnn31WN910k/bs2aP09HTr5ZmoqqqSpHNeH18/d7mYMWOGZs2apWHDhunAgQP65S9/qZKSEm3ZskXJycnWy4u7trY2LVy4UJMnT9aYMWMknbkeUlJS1L9//w779uTr4VznQZLuvfdeDRkyRPn5+dq9e7eeeOIJ7d27V2+99Zbhajvq8gWE/ykpKWn/87hx41RYWKghQ4bojTfe0P3332+4MnQFd999d/ufx44dq3HjxmnEiBHauHGjpk6dariyxCgtLdWePXsui9dBL+R85+Ghhx5q//PYsWOVl5enqVOn6sCBAxoxYkRnL/Ocuvy34LKyspScnHzWu1iqq6uVm5trtKquoX///ho1apT2799vvRQzX18DXB9nGz58uLKysnrk9bFgwQK98847+uCDDzr8+pbc3Fw1Nzerpqamw/499Xo433k4l8LCQknqUtdDly+glJQUTZgwQeXl5e2PtbW1qby8XEVFRYYrs3fq1CkdOHBAeXl51ksxM2zYMOXm5na4PmKxmLZt23bZXx9HjhzRyZMne9T1EQSBFixYoNWrV2vDhg0aNmxYh+cnTJig3r17d7ge9u7dq0OHDvWo6+Fi5+Fcdu3aJUld63qwfhfEpXjttdeCcDgcrFy5Mvj3v/8dPPTQQ0H//v2Dqqoq66V1qp///OfBxo0bg4MHDwb//Oc/g+Li4iArKys4duyY9dISqra2Nti5c2ewc+fOQFLwu9/9Lti5c2fwxRdfBEEQBM8//3zQv3//YO3atcHu3buDO+64Ixg2bFjQ0NBgvPL4utB5qK2tDR577LFgy5YtwcGDB4P3338/+MEPfhCMHDkyaGxstF563MyfPz+IRCLBxo0bg6NHj7Zv9fX17fs8/PDDweDBg4MNGzYE27dvD4qKioKioiLDVcffxc7D/v37g1/96lfB9u3bg4MHDwZr164Nhg8fHkyZMsV45R11iwIKgiD4wx/+EAwePDhISUkJJk2aFGzdutV6SZ1uzpw5QV5eXpCSkhJcccUVwZw5c4L9+/dbLyvhPvjgg0DSWdvcuXODIDjzVuynnnoqyMnJCcLhcDB16tRg7969totOgAudh/r6+mDatGnBwIEDg969ewdDhgwJHnzwwR73P2nn+u+XFKxYsaJ9n4aGhuCnP/1p8L3vfS/o27dvcOeddwZHjx61W3QCXOw8HDp0KJgyZUqQmZkZhMPh4Morrwx+8YtfBNFo1Hbh38KvYwAAmOjyrwEBAHomCggAYIICAgCYoIAAACYoIACACQoIAGCCAgIAmKCAAAAmKCAAgAkKCABgggICAJiggAAAJv4fq+TKSY6M9H8AAAAASUVORK5CYII=\n"
+          },
+          "metadata": {}
+        }
+      ],
+      "source": [
+        "from matplotlib import pyplot as plt\n",
+        "\n",
+        "print (\"label:\" + str(labels[0]))\n",
+        "\n",
+        "pixels = images[0]\n",
+        "\n",
+        "plt.imshow(pixels, cmap='gray')\n",
+        "\n",
+        "plt.show()"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 4,
+      "id": "eastern-handbook",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "eastern-handbook",
+        "outputId": "5b75da23-a87a-4652-ceb1-5c96a1ed0fe0"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Epoch 1/10\n",
+            "\u001b[1m1875/1875\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m11s\u001b[0m 3ms/step - loss: 0.6517 - sparse_categorical_accuracy: 0.7739\n",
+            "Epoch 2/10\n",
+            "\u001b[1m1875/1875\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m4s\u001b[0m 2ms/step - loss: 0.3849 - sparse_categorical_accuracy: 0.8600\n",
+            "Epoch 3/10\n",
+            "\u001b[1m1875/1875\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m5s\u001b[0m 2ms/step - loss: 0.3402 - sparse_categorical_accuracy: 0.8729\n",
+            "Epoch 4/10\n",
+            "\u001b[1m1875/1875\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m4s\u001b[0m 2ms/step - loss: 0.3137 - sparse_categorical_accuracy: 0.8851\n",
+            "Epoch 5/10\n",
+            "\u001b[1m1875/1875\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m6s\u001b[0m 3ms/step - loss: 0.2927 - sparse_categorical_accuracy: 0.8915\n",
+            "Epoch 6/10\n",
+            "\u001b[1m1875/1875\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m4s\u001b[0m 2ms/step - loss: 0.2759 - sparse_categorical_accuracy: 0.8973\n",
+            "Epoch 7/10\n",
+            "\u001b[1m1875/1875\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m5s\u001b[0m 2ms/step - loss: 0.2630 - sparse_categorical_accuracy: 0.9010\n",
+            "Epoch 8/10\n",
+            "\u001b[1m1875/1875\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m5s\u001b[0m 2ms/step - loss: 0.2525 - sparse_categorical_accuracy: 0.9055\n",
+            "Epoch 9/10\n",
+            "\u001b[1m1875/1875\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m4s\u001b[0m 2ms/step - loss: 0.2405 - sparse_categorical_accuracy: 0.9095\n",
+            "Epoch 10/10\n",
+            "\u001b[1m1875/1875\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m5s\u001b[0m 3ms/step - loss: 0.2286 - sparse_categorical_accuracy: 0.9139\n"
+          ]
+        },
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "<keras.src.callbacks.history.History at 0x7e4bf1639d90>"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 4
+        }
+      ],
+      "source": [
+        "model = tf.keras.Sequential([\n",
+        "\n",
+        "   tf.keras.layers.Flatten(),\n",
+        "\n",
+        "   tf.keras.layers.Dense(100, activation=\"relu\"),\n",
+        "\n",
+        "   tf.keras.layers.Dense(50, activation=\"relu\"),\n",
+        "\n",
+        "   tf.keras.layers.Dense(10),\n",
+        "\n",
+        "   tf.keras.layers.Softmax()\n",
+        "\n",
+        "])\n",
+        "\n",
+        "model.compile(optimizer='adam',\n",
+        "\n",
+        "              loss=tf.keras.losses.SparseCategoricalCrossentropy(),\n",
+        "\n",
+        "              metrics=[tf.keras.metrics.SparseCategoricalAccuracy()])\n",
+        "\n",
+        "\n",
+        "\n",
+        "model.fit(train_ds, epochs=10)"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 5,
+      "id": "alert-dictionary",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "alert-dictionary",
+        "outputId": "cf377672-5863-4bd9-ea5a-34cf50d7b061"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "\u001b[1m1875/1875\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m4s\u001b[0m 2ms/step - loss: 0.2600 - sparse_categorical_accuracy: 0.9012\n",
+            "test loss, test acc: [0.25737428665161133, 0.9013833403587341]\n"
+          ]
+        }
+      ],
+      "source": [
+        "images_test, labels_test = test\n",
+        "\n",
+        "labels_test = labels_test.astype(np.int32)\n",
+        "\n",
+        "\n",
+        "\n",
+        "images_test = images_test/256\n",
+        "\n",
+        "\n",
+        "\n",
+        "test_ds = tf.data.Dataset.from_tensor_slices((images_test, labels_test))\n",
+        "\n",
+        "test_ds = train_ds.batch(32)\n",
+        "\n",
+        "test_ds = train_ds.shuffle(30)\n",
+        "\n",
+        "\n",
+        "\n",
+        "results = model.evaluate(test_ds)\n",
+        "\n",
+        "print(\"test loss, test acc:\", results)"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 6,
+      "id": "oriental-grace",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "oriental-grace",
+        "outputId": "2f361e50-cf37-401f-9789-b377a030169b"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "\u001b[1m313/313\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m1s\u001b[0m 2ms/step\n"
+          ]
+        },
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "0.843"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 6
+        }
+      ],
+      "source": [
+        "predictions = model.predict(test[0])\n",
+        "\n",
+        "predicted_labels = np.argmax(predictions, axis=1)\n",
+        "\n",
+        "m = tf.keras.metrics.Accuracy()\n",
+        "\n",
+        "m.update_state(predicted_labels, test[1])\n",
+        "\n",
+        "m.result().numpy()"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 7,
+      "id": "common-tactics",
+      "metadata": {
+        "id": "common-tactics"
+      },
+      "outputs": [],
+      "source": [
+        "model.save(\"my_model.keras\")"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 7,
+      "id": "naked-payday",
+      "metadata": {
+        "id": "naked-payday"
+      },
+      "outputs": [],
+      "source": []
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "display_name": "Python 3",
+      "name": "python3"
+    },
+    "language_info": {
+      "codemirror_mode": {
+        "name": "ipython",
+        "version": 3
+      },
+      "file_extension": ".py",
+      "mimetype": "text/x-python",
+      "name": "python",
+      "nbconvert_exporter": "python",
+      "pygments_lexer": "ipython3",
+      "version": "3.10.13"
+    },
+    "colab": {
+      "provenance": [],
+      "gpuType": "T4",
+      "include_colab_link": true
+    },
+    "accelerator": "GPU"
+  },
+  "nbformat": 4,
+  "nbformat_minor": 5
+}
